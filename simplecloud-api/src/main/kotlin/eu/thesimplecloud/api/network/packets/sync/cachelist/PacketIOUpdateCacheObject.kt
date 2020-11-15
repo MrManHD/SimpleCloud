@@ -25,6 +25,7 @@ package eu.thesimplecloud.api.network.packets.sync.cachelist
 import eu.thesimplecloud.api.CloudAPI
 import eu.thesimplecloud.clientserverapi.lib.connection.IConnection
 import eu.thesimplecloud.clientserverapi.lib.packet.packettype.JsonPacket
+import eu.thesimplecloud.clientserverapi.lib.promise.CommunicationPromise
 import eu.thesimplecloud.clientserverapi.lib.promise.ICommunicationPromise
 
 class PacketIOUpdateCacheObject() : JsonPacket() {
@@ -50,17 +51,16 @@ class PacketIOUpdateCacheObject() : JsonPacket() {
         )
         val value = this.jsonLib.getObject("value", valueClass) ?: return contentException("value")
 
-        when (action) {
+        return when (action) {
             Action.UPDATE -> {
                 CloudAPI.instance.getCacheListManager().getCacheListenerByName(cacheListName)
-                        ?.update(value, true)
+                        ?.update(value, true) ?: CommunicationPromise.of(Unit)
             }
             Action.DELETE -> {
                 CloudAPI.instance.getCacheListManager().getCacheListenerByName(cacheListName)
-                        ?.delete(value, true)
+                        ?.delete(value, true) ?: CommunicationPromise.of(Unit)
             }
         }
-        return unit()
     }
 
     enum class Action {

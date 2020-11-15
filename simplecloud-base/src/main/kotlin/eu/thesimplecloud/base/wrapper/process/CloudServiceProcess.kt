@@ -64,7 +64,7 @@ class CloudServiceProcess(private val cloudService: ICloudService) : ICloudServi
             this.cloudService.setPort(Wrapper.instance.portManager.getUnusedPort())
         }
         this.cloudService.setState(ServiceState.STARTING)
-        CloudAPI.instance.getCloudServiceManager().update(this.cloudService)
+        CloudAPI.instance.getCloudServiceManager().update(this.cloudService).awaitUninterruptibly()
 
         TemplateCopier().copyTemplate(cloudService, cloudService.getTemplate())
 
@@ -111,7 +111,7 @@ class CloudServiceProcess(private val cloudService: ICloudService) : ICloudServi
             }
             this.cloudService.setOnlineCount(0)
             this.cloudService.setState(ServiceState.CLOSED)
-            CloudAPI.instance.getCloudServiceManager().delete(this.cloudService)
+            CloudAPI.instance.getCloudServiceManager().delete(this.cloudService).awaitUninterruptibly()
             Wrapper.instance.updateWrapperData()
         }
 
